@@ -36,6 +36,14 @@ module Marea
       "E[#{@value.inspect}, #{@whole}, #{@part}]"
     end
     alias_method :to_s, :inspect
+
+    # @private
+    def ==(o)
+      self.class == o.class &&
+        @whole == o.whole &&
+        @part == o.part &&
+        @value == o.value
+    end
   end
 
   class E < Event; end

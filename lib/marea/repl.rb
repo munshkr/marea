@@ -29,7 +29,7 @@ module Marea
         Pry.config.pager = false
         Pry.config.prompt = [ proc { "" }, proc { "" }]
       else
-        Pry.config.prompt = [ proc { "marea> " }, proc { "..> " }]
+        Pry.config.prompt = [ proc { cyan("marea> ") }, proc { cyan("   ..> ") }]
       end
 
       Pry.config.history.file = history_path
@@ -45,6 +45,10 @@ module Marea
 
     def red(string)
       "\e[31m\e[1m#{string}\e[22m\e[0m"
+    end
+
+    def cyan(string)
+      "\e[36m\e[1m#{string}\e[0m\e[0m"
     end
 
     def load_init_script

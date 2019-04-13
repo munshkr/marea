@@ -1,5 +1,6 @@
 require "marea/version"
 require "marea/event"
+require "marea/pattern"
 
 module Marea
   class Error < StandardError; end

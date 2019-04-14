@@ -1,8 +1,10 @@
 require "marea/pattern/generators"
+require "marea/pattern/transformers"
 
 module Marea
   class Pattern
     extend Generators
+    include Transformers
 
     attr_reader :block
 
@@ -15,19 +17,30 @@ module Marea
       @block.call(arc)
     end
 
+    # Returns pattern by applying +block+ to both whole and part arcs of all
+    # events
+    #
+    # @returns [Pattern]
+    #
     def with_result_time(&block)
       raise 'no block given' if block.nil?
 
-      self.class.new do |arc|
+      Pattern.new do |arc|
         self.call(arc).map do |ev|
-          Event.new(ev.whole.apply(&block), ev.part.apply(&block), ev.value)
+          Event.new(ev.value, ev.whole.apply(&block), ev.part.apply(&block))
         end
       end
     end
 
+    def with_query_time(&block)
+      Pattern.new do |arc|
+        self.call(arc.apply(&block))
+      end
+    end
+
     def split_queries
-      self.class.new do |arc|
-        arc.cycles.map { |cycle| self.call(cycle) }
+      Pattern.new do |arc|
+        arc.cycles.map { |cycle| self.call(cycle) }.flatten(1)
       end
     end
   end

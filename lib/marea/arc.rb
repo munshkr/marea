@@ -3,8 +3,8 @@ module Marea
     attr_reader :begin, :end
 
     def initialize(range_or_arc)
-      @begin = range_or_arc.begin
-      @end = range_or_arc.end
+      @begin = range_or_arc.begin.to_r
+      @end = range_or_arc.end.to_r
 
       if [@begin, @end].any?(&:nil?)
         raise ArgumentError, "invalid range"

@@ -1,12 +1,12 @@
 module Marea
   class Arc
-    attr_reader :begin, :end
+    attr_reader :from, :to
 
-    def initialize(range_or_arc)
-      @begin = range_or_arc.begin.to_r
-      @end = range_or_arc.end.to_r
+    def initialize(from, to)
+      @from = from.to_r
+      @to = to.to_r
 
-      if [@begin, @end].any?(&:nil?)
+      if [@from, @to].any?(&:nil?)
         raise ArgumentError, "invalid range"
       end
     end
@@ -15,12 +15,12 @@ module Marea
     #
     # @see Arc#initialize
     #
-    def self.[](range)
-      new(range)
+    def self.[](*args)
+      new(*args)
     end
 
     def inspect
-      "Arc[#{@begin}..#{@end}]"
+      "Arc[#{@from}, #{@to}]"
     end
     alias_method :to_s, :inspect
 
@@ -33,15 +33,15 @@ module Marea
     # @returns [Array(Arc)]
     #
     def cycles
-      b = @begin
-      e = @end
+      f = @from
+      t = @to
       res = []
-      while (b < e && b.floor != e.floor) do
-        next_cycle = b.floor + 1
-        res << Arc.new(b..next_cycle)
-        b = next_cycle
+      while (f < t && f.floor != t.floor) do
+        next_cycle = f.floor + 1
+        res << Arc.new(f, next_cycle)
+        f = next_cycle
       end
-      res << Arc.new(b..e) if b < e && b.floor == e.floor
+      res << Arc.new(f, t) if f < t && f.floor == t.floor
       res
     end
 
@@ -50,25 +50,25 @@ module Marea
     # @returns [Array(Arc)]
     #
     def whole_cycles
-      s = @begin.to_f.floor
-      e = @end.to_f.ceil - 1
-      (s..e).map { |t| Arc.new(t..(t+1)) }
+      f = @from.to_f.floor
+      t = @to.to_f.ceil - 1
+      (f..t).map { |t| Arc.new(t, t+1) }
     end
 
-    # Returns a new arc by applying +block+ to both +begin+ and +end+
+    # Returns a new arc by applying +block+ to both +from+ and +to+
     #
     # @param block
     # @returns [Arc]
     #
     def apply(&block)
-      Arc.new(block.call(@begin)..block.call(@end))
+      Arc.new(block.call(@from), block.call(@to))
     end
 
     # @private
     def ==(o)
       self.class == o.class &&
-        @begin == o.begin &&
-        @end == o.end
+        @from == o.from &&
+        @to == o.to
     end
   end
 end

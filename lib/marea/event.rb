@@ -7,14 +7,14 @@ module Marea
     # Creates a new Event given a +value+, and +whole+ and +part+ ranges
     #
     # @param value [Object]
-    # @param whole [Range(Fixnum)] (default: 0..1)
-    # @param part [Range(Fixnum)] (default: 0..1)
+    # @param whole [Arc] (default: Arc[0, 1])
+    # @param part [Arc] (default: Arc[0, 1])
     # @return [Event]
     #
     def initialize(value, whole=nil, part=nil)
       @value = value
-      @whole = whole || (0..1)
-      @part = part || (0..1)
+      @whole = whole || Arc.new(0, 1)
+      @part = part || Arc.new(0, 1)
     end
 
     # Creates a new Event

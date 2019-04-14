@@ -33,7 +33,7 @@ module Marea
     # @return [String]
     #
     def inspect
-      "E[#{@value.inspect}, #{@whole}, #{@part}]"
+      "Event[#{@value.inspect}, #{@whole}, #{@part}]"
     end
     alias_method :to_s, :inspect
 
@@ -45,6 +45,4 @@ module Marea
         @value == o.value
     end
   end
-
-  class E < Event; end
 end

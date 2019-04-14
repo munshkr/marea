@@ -17,6 +17,10 @@ module Marea
       @block.call(arc)
     end
 
+    def p
+      self
+    end
+
     # Returns pattern by applying +block+ to both whole and part arcs of all
     # events
     #

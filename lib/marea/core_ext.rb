@@ -1,3 +1,7 @@
 require 'marea/core_ext/fixnum'
 require 'marea/core_ext/float'
 require 'marea/core_ext/range'
+require 'marea/core_ext/array'
+require 'marea/core_ext/enumerable'
+require 'marea/core_ext/scalar'
+require 'marea/core_ext/nil'

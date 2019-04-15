@@ -24,10 +24,6 @@ module Marea
     end
     alias_method :to_s, :inspect
 
-    def to_arc
-      self
-    end
-
     # Split this arc into a list of arcs, at cycle boundaries
     #
     # @returns [Array(Arc)]
@@ -45,7 +41,7 @@ module Marea
       res
     end
 
-    # Returns a list of arcs of the whole cycles which are included in this arc
+    # Returns a list of arcs of the whole cycles that contain this arc
     #
     # @returns [Array(Arc)]
     #

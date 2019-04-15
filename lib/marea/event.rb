@@ -17,14 +17,6 @@ module Marea
       @part = part || Arc.new(0, 1)
     end
 
-    # Creates a new Event
-    #
-    # @see Event#initialize
-    #
-    def self.[](*args)
-      new(*args)
-    end
-
     # Returns a string containing a human-readable representation
     #
     # This string usually is valid Ruby, and can be evaluated to construct the
@@ -33,7 +25,7 @@ module Marea
     # @return [String]
     #
     def inspect
-      "Event[#{@value.inspect}, #{@whole}, #{@part}]"
+      "<#{@value.inspect} #{@whole} #{@part}>"
     end
     alias_method :to_s, :inspect
 

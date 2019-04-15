@@ -11,16 +11,8 @@ module Marea
       end
     end
 
-    # Creates a new Arc
-    #
-    # @see Arc#initialize
-    #
-    def self.[](*args)
-      new(*args)
-    end
-
     def inspect
-      "Arc[#{@from}, #{@to}]"
+      "#{@from}..#{@to}"
     end
     alias_method :to_s, :inspect
 

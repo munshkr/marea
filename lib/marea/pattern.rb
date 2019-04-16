@@ -46,6 +46,36 @@ module Marea
       end
     end
 
+    # Evaluates pattern from 0 to +to+, as a preview of resulting events
+    #
+    # @param to [Rational] (default: 1)
+    # @return [Array(Event)]
+    #
+    def peek(to=1)
+      self.call(Arc.new(0, to))
+    end
+
+    # Merge with +other_pattern+ using structure from +self+
+    #
+    # @param other_pattern [Pattern, Object]
+    # @return [Pattern]
+    #
+    def left_merge(other_pattern, &block)
+      oriented_merge(other_pattern, &block)
+    end
+    alias_method :<<, :left_merge
+
+    # Merge with +other_pattern+ using structure from +other_pattern+
+    #
+    # @param other_pattern [Pattern, Object]
+    # @return [Pattern]
+    #
+    def right_merge(other_pattern, &block)
+      oriented_merge(other_pattern, invert=true, &block)
+    end
+    alias_method :>>, :right_merge
+
+    # @private
     def split_queries
       Pattern.new do |arc|
         arc.cycles
@@ -54,13 +84,22 @@ module Marea
       end
     end
 
-    # Evaluates pattern from 0 to +to+, as a preview of resulting events
-    #
-    # @param to [Rational] (default: 1)
-    # @return [Array(Event)]
-    #
-    def peek(to=1)
-      self.call(Arc.new(0, to))
+    protected
+
+    def oriented_merge(other_pattern, invert=false, &block)
+      block ||= lambda { |a, b| b }
+      src, dst = invert ? [self, other_pattern] : [other_pattern, self]
+      Pattern.new do |arc|
+        dst.p.call(arc).map do |event|
+          # match with the onset (#whole.from)
+          src_events = src.p.call(Arc.new(event.whole.from, event.whole.from))
+          value = event.value.dup
+          src_events.each do |src_event|
+            value = block.call(value, src_event.value)
+          end
+          Event.new(value, event.whole, event.part)
+        end
+      end
     end
   end
 

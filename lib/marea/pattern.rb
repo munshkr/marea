@@ -24,7 +24,7 @@ module Marea
     # Returns new pattern by applying +block+ to both whole and part arcs of
     # all events
     #
-    # @returns [Pattern]
+    # @return [Pattern]
     #
     def with_result_time(&block)
       raise 'no block given' if block.nil?
@@ -38,7 +38,7 @@ module Marea
 
     # Returns new pattern by applying +block+ to query arc
     #
-    # @returns [Pattern]
+    # @return [Pattern]
     #
     def with_query_time(&block)
       Pattern.new do |arc|
@@ -52,6 +52,15 @@ module Marea
           .map { |cycle_arc| self.call(cycle_arc) }
           .flatten(1)
       end
+    end
+
+    # Evaluates pattern from 0 to +to+, as a preview of resulting events
+    #
+    # @param to [Rational] (default: 1)
+    # @return [Array(Event)]
+    #
+    def peek(to=1)
+      self.call(Arc.new(0, to))
     end
   end
 

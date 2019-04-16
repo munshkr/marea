@@ -75,6 +75,13 @@ module Marea
     end
     alias_method :>>, :right_merge
 
+    def +(o);  left_merge(o) { |a, b| a + b }; end
+    def -(o);  left_merge(o) { |a, b| a - b }; end
+    def *(o);  left_merge(o) { |a, b| a * b }; end
+    def /(o);  left_merge(o) { |a, b| a / b }; end
+    def %(o);  left_merge(o) { |a, b| a % b }; end
+    def **(o); left_merge(o) { |a, b| a ** b }; end
+
     # @private
     def split_queries
       Pattern.new do |arc|
@@ -87,7 +94,7 @@ module Marea
     protected
 
     def oriented_merge(other_pattern, invert=false, &block)
-      block ||= lambda { |a, b| b }
+      block ||= lambda { |a, b| invert ? a : b }
       src, dst = invert ? [self, other_pattern] : [other_pattern, self]
       Pattern.new do |arc|
         dst.p.call(arc).map do |event|

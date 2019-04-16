@@ -43,6 +43,10 @@ module Marea
       (f..t).map { |t| Arc.new(t, t+1) }
     end
 
+    def sect(other_arc)
+      Arc.new([@from, other_arc.from].max, [@to, other_arc.to].min)
+    end
+
     # Returns a new arc by applying +block+ to both +from+ and +to+
     #
     # @param block

@@ -4,7 +4,8 @@ module Marea
       def pure(value)
         Pattern.new do |arc|
           arc.whole_cycles.map do |cycle_arc|
-            Event.new(value, cycle_arc, cycle_arc)
+            part_arc = arc.sect(cycle_arc)
+            Event.new(value, cycle_arc, part_arc)
           end
         end
       end

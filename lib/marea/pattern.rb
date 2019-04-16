@@ -21,6 +21,11 @@ module Marea
       self
     end
 
+    def inspect
+      "#<Pattern #{self.peek.join(', ')}...>"
+    end
+    alias_method :to_s, :inspect
+
     # Returns new pattern by applying +block+ to both whole and part arcs of
     # all events
     #

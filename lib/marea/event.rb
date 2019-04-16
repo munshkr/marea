@@ -25,7 +25,7 @@ module Marea
     # @return [String]
     #
     def inspect
-      "<#{@value.inspect} #{@whole} #{@part}>"
+      "(#{@value.inspect} #{@whole} #{@part})"
     end
     alias_method :to_s, :inspect
 

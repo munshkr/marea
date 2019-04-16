@@ -11,6 +11,13 @@ describe Arc do
 
   describe "#cycles" do
     it "splits arc into a list of arcs at cycle boundaries" do
+      arcs = Arc.new(0, 3).cycles
+      assert_equal [
+        Arc.new(0, 1),
+        Arc.new(1, 2),
+        Arc.new(2, 3),
+      ], arcs
+
       arcs = Arc.new(0, 3.5).cycles
       assert_equal [
         Arc.new(0, 1),
@@ -19,10 +26,39 @@ describe Arc do
         Arc.new(3, 3.5),
       ], arcs
     end
+
+    it "returns an empty list if arc has no width" do
+      arcs = Arc.new(0, 0).cycles
+      assert_equal [], arcs
+    end
+  end
+
+  describe "#cycles_zero_width" do
+    it "splits arc into a list of arcs at cycle boundaries" do
+      arcs = Arc.new(0, 3.5).cycles_zero_width
+      assert_equal [
+        Arc.new(0, 1),
+        Arc.new(1, 2),
+        Arc.new(2, 3),
+        Arc.new(3, 3.5),
+      ], arcs
+    end
+
+    it "works with zero-width arcs" do
+      arcs = Arc.new(2, 2).cycles_zero_width
+      assert_equal [Arc.new(2, 2)], arcs
+    end
   end
 
   describe "#whole_cycles" do
     it "returns a list of arcs of the whole cycles which are included in this arc" do
+      arcs = Arc.new(0, 3).whole_cycles
+      assert_equal [
+        Arc.new(0, 1),
+        Arc.new(1, 2),
+        Arc.new(2, 3),
+      ], arcs
+
       arcs = Arc.new(0, 3.5).whole_cycles
       assert_equal [
         Arc.new(0, 1),

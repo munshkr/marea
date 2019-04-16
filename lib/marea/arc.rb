@@ -52,7 +52,12 @@ module Marea
       end
     end
 
-    def sect(other_arc)
+    # Returns the intersection of two arcs
+    #
+    # @param other_arc [Arc]
+    # @return [Arc]
+    #
+    def intersect(other_arc)
       Arc.new([@from, other_arc.from].max, [@to, other_arc.to].min)
     end
 

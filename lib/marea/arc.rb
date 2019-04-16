@@ -18,7 +18,7 @@ module Marea
 
     # Split this arc into a list of arcs, at cycle boundaries
     #
-    # @returns [Array(Arc)]
+    # @return [Array(Arc)]
     #
     def cycles
       f = @from
@@ -35,7 +35,7 @@ module Marea
 
     # Returns a list of arcs of the whole cycles that contain this arc
     #
-    # @returns [Array(Arc)]
+    # @return [Array(Arc)]
     #
     def whole_cycles
       f = @from.to_f.floor
@@ -46,7 +46,7 @@ module Marea
     # Returns a new arc by applying +block+ to both +from+ and +to+
     #
     # @param block
-    # @returns [Arc]
+    # @return [Arc]
     #
     def apply(&block)
       Arc.new(block.call(@from), block.call(@to))

@@ -33,14 +33,23 @@ module Marea
       res
     end
 
+    # Same as #cycles but returns also zero-widths arcs
+    def cycles_zero_width
+      @from == @to ? [self] : self.cycles
+    end
+
     # Returns a list of arcs of the whole cycles that contain this arc
     #
     # @return [Array(Arc)]
     #
     def whole_cycles
-      f = @from.to_f.floor
-      t = @to.to_f.ceil - 1
-      (f..t).map { |t| Arc.new(t, t+1) }
+      return [] if @from > @to
+      from = @from.to_f.floor
+      if @from == @to
+        [Arc.new(from, from + 1)]
+      else
+        (from .. @to.to_f.ceil - 1).map { |t| Arc.new(t, t+1) }
+      end
     end
 
     def sect(other_arc)

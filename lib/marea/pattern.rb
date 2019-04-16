@@ -22,7 +22,7 @@ module Marea
     end
 
     def inspect
-      "#<Pattern #{self.peek.join(', ')}...>"
+      "#<Pattern [#{self.peek.join(', ')}, ...]>"
     end
     alias_method :to_s, :inspect
 
@@ -87,10 +87,18 @@ module Marea
     def %(o);  left_merge(o) { |a, b| a % b }; end
     def **(o); left_merge(o) { |a, b| a ** b }; end
 
-    # @private
+    # Splits queries that span cycles.
+    #
+    # For example `query p (0.5, 1.5)` would be turned into two queries,
+    # `(0.5,1)` and `(1,1.5)`, and the results combined.
+    # Being able to assume queries don't span cycles often makes
+    # transformations easier to specify.
+    #
+    # @return [Pattern]
+    #
     def split_queries
       Pattern.new do |arc|
-        arc.cycles
+        arc.cycles_zero_width
           .map { |cycle_arc| self.call(cycle_arc) }
           .flatten(1)
       end

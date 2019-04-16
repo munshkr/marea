@@ -2,9 +2,9 @@ module Marea
   class Pattern
     module Generators
       def pure(value)
-        Pattern.new do |from, to|
-          Arc.new(from, to).whole_cycles.map do |arc|
-            Event.new(value, arc, arc)
+        Pattern.new do |arc|
+          arc.whole_cycles.map do |cycle_arc|
+            Event.new(value, cycle_arc, cycle_arc)
           end
         end
       end
@@ -14,15 +14,16 @@ module Marea
       end
 
       def cat(array)
-        pattern = Pattern.new do |from, to|
+        pattern = Pattern.new do |arc|
           l = array.size
-          r = from.floor
+          r = arc.from.floor
           n = r % l
           p = self.pure(array[n])
 
           offset = r - ((r - n) / l)
+
           p.with_result_time { |t| t + offset }
-            .call(from - offset, to - offset)
+            .call(Arc.new(arc.from - offset, arc.to - offset))
         end
         pattern.split_queries
       end

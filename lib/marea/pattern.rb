@@ -13,8 +13,8 @@ module Marea
       @block = block
     end
 
-    def call(from, to)
-      @block.call(from, to)
+    def call(arc)
+      @block.call(arc)
     end
 
     def p
@@ -29,24 +29,27 @@ module Marea
     def with_result_time(&block)
       raise 'no block given' if block.nil?
 
-      Pattern.new do |from, to|
-        self.call(from, to).map do |ev|
+      Pattern.new do |arc|
+        self.call(arc).map do |ev|
           Event.new(ev.value, ev.whole.apply(&block), ev.part.apply(&block))
         end
       end
     end
 
     # Returns new pattern by applying +block+ to query arc
+    #
+    # @returns [Pattern]
+    #
     def with_query_time(&block)
-      Pattern.new do |from, to|
-        self.call(Arc.new(from, to).apply(&block))
+      Pattern.new do |arc|
+        self.call(arc.apply(&block))
       end
     end
 
     def split_queries
-      Pattern.new do |from, to|
-        Arc.new(from, to).cycles
-          .map { |cycle| self.call(cycle.from, cycle.to) }
+      Pattern.new do |arc|
+        arc.cycles
+          .map { |cycle_arc| self.call(cycle_arc) }
           .flatten(1)
       end
     end

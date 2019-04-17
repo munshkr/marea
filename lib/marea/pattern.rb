@@ -80,12 +80,17 @@ module Marea
     end
     alias_method :>>, :right_merge
 
-    def +(o);  left_merge(o) { |a, b| a + b }; end
-    def -(o);  left_merge(o) { |a, b| a - b }; end
-    def *(o);  left_merge(o) { |a, b| a * b }; end
-    def /(o);  left_merge(o) { |a, b| a / b }; end
-    def %(o);  left_merge(o) { |a, b| a % b }; end
-    def **(o); left_merge(o) { |a, b| a ** b }; end
+    def merge(other_pattern, &block)
+      Pattern.merge(other_pattern, self, &block)
+    end
+    alias_method :|, :merge
+
+    def +(o);  merge(o) { |a, b| a + b }; end
+    def -(o);  merge(o) { |a, b| a - b }; end
+    def *(o);  merge(o) { |a, b| a * b }; end
+    def /(o);  merge(o) { |a, b| a / b }; end
+    def %(o);  merge(o) { |a, b| a % b }; end
+    def **(o); merge(o) { |a, b| a ** b }; end
 
     # Splits queries that span cycles.
     #
@@ -105,6 +110,20 @@ module Marea
     end
 
     protected
+
+    def self.merge(src, dst, &block)
+      Pattern.new do |arc|
+        dst.p.call(arc).map do |event|
+          src_events = src.p.call(event.part)
+          src_events.map do |src_event|
+            value = self.merge_event_value(event.value, src_event.value, &block)
+            new_whole = src_event.whole.sub_arc(event.whole)
+            new_part  = event.part.sub_arc(src_event.part)
+            Event.new(value, new_whole, new_part)
+          end
+        end
+      end
+    end
 
     def self.oriented_merge(src, dst, &block)
       Pattern.new do |arc|
@@ -127,6 +146,8 @@ module Marea
     # @return [Object] a value
     #
     def self.merge_event_value(a, b, &block)
+      a = a.dup
+      b = b.dup
       block ||= lambda { |_, y| y }
       if a.is_a?(Hash) && b.is_a?(Hash)
         a.merge_values(b, &block)

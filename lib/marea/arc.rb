@@ -61,6 +61,24 @@ module Marea
       Arc.new([@from, other_arc.from].max, [@to, other_arc.to].min)
     end
 
+    # Similar to #intersection, but with some border cases regarding zero-width
+    # arcs.
+    #
+    # Results might be zero-width except at the end of non-zero-width arcs
+    # e.g. (0, 1) and (1, 2) do not intersect, but (1, 1) and (1, 1) does.
+    #
+    # @param o [Arc]
+    # @return [Arc]
+    #
+    def sub_arc(o)
+      sect = self.intersect(o)
+      # FIXME Refactor condition
+      return if (sect.from == sect.to && sect.from == self.to && self.from < self.to) ||
+                (sect.from == sect.to && sect.from == o.to && o.from < o.to)
+      return sect if sect.from <= sect.to
+      nil
+    end
+
     # Returns a new arc by applying +block+ to both +from+ and +to+
     #
     # @param block

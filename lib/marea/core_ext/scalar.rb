@@ -16,4 +16,3 @@ class Float;    include Marea::CoreExt::Scalar; end
 class String;   include Marea::CoreExt::Scalar; end
 class Symbol;   include Marea::CoreExt::Scalar; end
 class Rational; include Marea::CoreExt::Scalar; end
-class Hash;     include Marea::CoreExt::Scalar; end

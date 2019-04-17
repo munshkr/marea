@@ -22,7 +22,8 @@ module Marea
     end
 
     def inspect
-      "#<Pattern [#{self.peek.join(', ')}, ...]>"
+      events = self.peek
+      "#<Pattern #{events.empty? ? 'silence' : "[#{events.join(', ')}, ...]"}>"
     end
     alias_method :to_s, :inspect
 
@@ -33,7 +34,6 @@ module Marea
     #
     def with_result_time(&block)
       raise 'no block given' if block.nil?
-
       Pattern.new do |arc|
         self.call(arc).map do |ev|
           Event.new(ev.value, ev.whole.apply(&block), ev.part.apply(&block))
@@ -46,8 +46,22 @@ module Marea
     # @return [Pattern]
     #
     def with_query_time(&block)
+      raise 'no block given' if block.nil?
       Pattern.new do |arc|
         self.call(arc.apply(&block))
+      end
+    end
+
+    # Returns new pattern by applying +block+ to value
+    #
+    # @return [Pattern]
+    #
+    def with_event_value(&block)
+      raise 'no block given' if block.nil?
+      Pattern.new do |arc|
+        self.call(arc).map do |ev|
+          Event.new(block.call(ev.value), ev.whole, ev.part)
+        end
       end
     end
 
@@ -95,9 +109,8 @@ module Marea
     # Splits queries that span cycles.
     #
     # For example `query p (0.5, 1.5)` would be turned into two queries,
-    # `(0.5,1)` and `(1,1.5)`, and the results combined.
-    # Being able to assume queries don't span cycles often makes
-    # transformations easier to specify.
+    # `(0.5,1)` and `(1,1.5)`, and the results combined.  Being able to assume
+    # queries don't span cycles often makes transformations easier to specify.
     #
     # @return [Pattern]
     #
@@ -113,15 +126,17 @@ module Marea
 
     def self.merge(src, dst, &block)
       Pattern.new do |arc|
-        dst.p.call(arc).map do |event|
+        res = []
+        dst.p.call(arc).each do |event|
           src_events = src.p.call(event.part)
-          src_events.map do |src_event|
+          src_events.each do |src_event|
             value = self.merge_event_value(event.value, src_event.value, &block)
             new_whole = src_event.whole.sub_arc(event.whole)
             new_part  = event.part.sub_arc(src_event.part)
-            Event.new(value, new_whole, new_part)
+            res << Event.new(value, new_whole, new_part)
           end
         end
+        res
       end
     end
 

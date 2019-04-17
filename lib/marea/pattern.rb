@@ -66,7 +66,7 @@ module Marea
     # @return [Pattern]
     #
     def left_merge(other_pattern, &block)
-      oriented_merge(other_pattern, &block)
+      Pattern.oriented_merge(other_pattern, self, &block)
     end
     alias_method :<<, :left_merge
 
@@ -76,7 +76,7 @@ module Marea
     # @return [Pattern]
     #
     def right_merge(other_pattern, &block)
-      oriented_merge(other_pattern, invert=true, &block)
+      Pattern.oriented_merge(self, other_pattern, &block)
     end
     alias_method :>>, :right_merge
 
@@ -106,19 +106,32 @@ module Marea
 
     protected
 
-    def oriented_merge(other_pattern, invert=false, &block)
-      block ||= lambda { |a, b| invert ? a : b }
-      src, dst = invert ? [self, other_pattern] : [other_pattern, self]
+    def self.oriented_merge(src, dst, &block)
       Pattern.new do |arc|
         dst.p.call(arc).map do |event|
           # match with the onset (#whole.from)
           src_events = src.p.call(Arc.new(event.whole.from, event.whole.from))
           value = event.value.dup
           src_events.each do |src_event|
-            value = block.call(value, src_event.value)
+            value = self.merge_event_value(value, src_event.value, &block)
           end
           Event.new(value, event.whole, event.part)
         end
+      end
+    end
+
+    # Returns merged value from other event
+    #
+    # @param other_event [Event]
+    # @param block
+    # @return [Object] a value
+    #
+    def self.merge_event_value(a, b, &block)
+      block ||= lambda { |_, y| y }
+      if a.is_a?(Hash) && b.is_a?(Hash)
+        a.merge_values(b, &block)
+      else
+        block.call(a, b)
       end
     end
   end

@@ -12,11 +12,13 @@ module Marea::CoreExt
     def merge_values(src, &block)
       block ||= lambda { |_, y| y }
       dst = self.clone
-      src.each do |k, v|
-        dst[k] = if dst[k].nil? || v.nil?
-          v
-        else
-          block.call(dst[k], v)
+      if src.is_a?(Hash)
+        src.each do |k, v|
+          dst[k] = (self[k].nil? || v.nil?) ? v : block.call(self[k], v)
+        end
+      else
+        self.each do |k, v|
+          dst[k] = v.nil? ? v : block.call(self[k], src)
         end
       end
       dst

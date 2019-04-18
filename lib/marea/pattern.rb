@@ -164,7 +164,7 @@ module Marea
       a = a.dup
       b = b.dup
       block ||= lambda { |_, y| y }
-      if a.is_a?(Hash) && b.is_a?(Hash)
+      if a.is_a?(Hash)
         a.merge_values(b, &block)
       else
         block.call(a, b)
